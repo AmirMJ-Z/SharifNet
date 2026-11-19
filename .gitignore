@@ -1,0 +1,17 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+build/
+dist/
+*.egg-info/
+debian/.debhelper/
+debian/files
+debian/*.debhelper
+debian/sharifnet/
+*.deb
+*.build
+*.buildinfo
+*.changes

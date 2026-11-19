@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    remove|deconfigure)
+        # User service lifecycle is handled separately.
+        ;;
+esac
+
+#DEBHELPER#
