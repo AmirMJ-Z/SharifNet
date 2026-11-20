@@ -48,6 +48,44 @@ logger = logging.getLogger(APP_NAME)
 
 
 # ============================================================
+# Terminal styling (built-in only; no external dependencies)
+# ============================================================
+
+class UI:
+    enabled = os.getenv("NO_COLOR") is None and os.isatty(1)
+    reset = "\033[0m"
+    bold = "\033[1m"
+    dim = "\033[2m"
+    cyan = "\033[96m"
+    green = "\033[92m"
+    yellow = "\033[93m"
+    white = "\033[97m"
+
+    @classmethod
+    def paint(cls, value, *styles):
+        return "".join(styles) + str(value) + cls.reset if cls.enabled else str(value)
+
+    @classmethod
+    def ask(cls, prompt):
+        return input(cls.paint("  " + prompt, cls.bold, cls.cyan))
+
+    @classmethod
+    def rule(cls, char="─"):
+        print(cls.paint(char * 58, cls.dim))
+
+
+def format_duration(seconds):
+    if seconds < 60:
+        return f"{seconds} seconds"
+    minutes, remainder = divmod(seconds, 60)
+    if minutes < 60:
+        return f"{minutes}m {remainder}s" if remainder else f"{minutes} minutes"
+    hours, minutes = divmod(minutes, 60)
+    return f"{hours}h {minutes}m" if minutes else f"{hours} hours"
+
+
+
+# ============================================================
 # Configuration Management
 # ============================================================
 
@@ -202,7 +240,7 @@ def has_credentials() -> bool:
 def set_credentials() -> None:
     print("\n--- Set Credentials ---")
 
-    username = input("Username: ").strip()
+    username = UI.ask("Username: ").strip()
     password = getpass("Password: ")
 
     if not username or not password:
@@ -265,7 +303,7 @@ def show_status() -> None:
 
         if status.connected:
             print("\nStatus: CONNECTED")
-            print(f"IP Address: {status.ip}")
+            print(f"  IP address        {UI.paint(status.ip, UI.bold, UI.cyan)}")
 
         else:
             print("\nStatus: DISCONNECTED")
@@ -329,7 +367,7 @@ def set_reconnect_interval(seconds=None) -> None:
         )
 
         try:
-            seconds = int(input("New interval (seconds): "))
+            seconds = int(UI.ask("New interval (seconds): "))
 
         except ValueError:
             print("Please enter a valid integer.")
@@ -429,8 +467,6 @@ def run_auto_reconnect() -> None:
                     "Auto-reconnect cycle failed."
                 )
 
-        # Check configuration every second, allowing the daemon
-        # to notice changes without waiting for the full interval.
         for _ in range(interval):
             time.sleep(1)
 
@@ -445,39 +481,48 @@ def run_auto_reconnect() -> None:
 
 def show_menu() -> None:
     config = load_config()
-
-    print("\n")
-    print("=" * 45)
-    print("             SHARIFNET CLIENT")
-    print("=" * 45)
-
-    print(
-        f"Username: "
-        f"{config['username'] or 'Not configured'}"
+    username = config["username"] or "Not configured"
+    reconnect = (
+        UI.paint("● ENABLED", UI.green, UI.bold)
+        if config["auto_reconnect"]
+        else UI.paint("● DISABLED", UI.yellow, UI.bold)
     )
 
-    print(
-        "Auto-reconnect: "
-        + ("ON" if config["auto_reconnect"] else "OFF")
-    )
+    print()
+    UI.rule("═")
+    print(UI.paint("   ███████╗██╗  ██╗ █████╗ ██████╗ ██╗███████╗", UI.cyan, UI.bold))
+    print(UI.paint("   ██╔════╝██║  ██║██╔══██╗██╔══██╗██║██╔════╝", UI.cyan, UI.bold))
+    print(UI.paint("   ███████╗███████║███████║██████╔╝██║█████╗  ", UI.cyan, UI.bold))
+    print(UI.paint("   ╚════██║██╔══██║██╔══██║██╔══██╗██║██╔══╝  ", UI.cyan, UI.bold))
+    print(UI.paint("   ███████║██║  ██║██║  ██║██║  ██║██║██║     ", UI.cyan, UI.bold))
+    print(UI.paint("   ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝╚═╝     ", UI.cyan, UI.bold))
+    print(UI.paint("                  NETWORK CLIENT", UI.dim, UI.bold))
+    UI.rule("═")
 
-    print(
-        f"Reconnect interval: "
-        f"{config['reconnect_interval']} seconds"
-    )
+    print(f"  {UI.paint('ACCOUNT', UI.dim, UI.bold)}")
+    print(f"  Username          {UI.paint(username, UI.white, UI.bold)}")
+    print()
+    print(f"  {UI.paint('CONNECTION MANAGEMENT', UI.dim, UI.bold)}")
+    print(f"  Auto-reconnect    {reconnect}")
+    print(f"  Reconnect period  {UI.paint(format_duration(config['reconnect_interval']), UI.white, UI.bold)}")
+    UI.rule()
 
-    print("-" * 45)
+    print(f"  {UI.paint('ACTIONS', UI.dim, UI.bold)}")
+    actions = [
+        ("1", "Connect", "Establish a SharifNet connection"),
+        ("2", "Disconnect", "Close the current connection"),
+        ("3", "Status", "View connection and IP details"),
+        ("4", "Credentials", "Update username and password"),
+        ("5", "Auto-reconnect", "Toggle automatic recovery"),
+        ("6", "Reconnect interval", "Configure monitoring frequency"),
+        ("7", "Daemon status", "Inspect the systemd monitor"),
+    ]
+    for key, label, description in actions:
+        print(f"  {UI.paint(key, UI.cyan, UI.bold)}  {UI.paint(label, UI.white, UI.bold):<30} {UI.paint(description, UI.dim)}")
 
-    print("1. Connect")
-    print("2. Disconnect")
-    print("3. Status")
-    print("4. Set Credentials")
-    print("5. Toggle Auto-Reconnect")
-    print("6. Set Reconnect Interval")
-    print("7. Show Daemon Status")
-    print("0. Exit")
-
-    print("=" * 45)
+    UI.rule()
+    print(f"  {UI.paint('0', UI.yellow, UI.bold)}  Exit")
+    UI.rule("═")
 
 
 def interactive_menu() -> None:
@@ -485,7 +530,7 @@ def interactive_menu() -> None:
 
         show_menu()
 
-        choice = input("\nSelect an option: ").strip()
+        choice = UI.ask("Select an option (0-7): ").strip()
 
         if choice == "1":
             connect_network()
@@ -523,9 +568,8 @@ def interactive_menu() -> None:
 # ============================================================
 
 def main():
-
     parser = argparse.ArgumentParser(
-        description="SharifNet CLI Client"
+        description="SharifNet — modern network client and connection manager"
     )
 
     subparsers = parser.add_subparsers(
@@ -548,7 +592,6 @@ def main():
         nargs="?",
     )
 
-    # Internal command used by systemd.
     subparsers.add_parser("monitor")
 
     args = parser.parse_args()

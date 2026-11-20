@@ -1,6 +1,8 @@
 <div align="center">
 
-# SharifNet
+<div align="center">
+  <img src="images/SharifNet University Network Logo.png" alt="SharifNet Logo" width="650">
+</div>
 
 ### A smarter way to manage your Sharif University of Technology network connection.
 
@@ -27,7 +29,7 @@ Instead of manually connecting to the university network whenever your connectio
 
 It also integrates with **systemd user services**, allowing automatic connection monitoring to run in the background without requiring an open terminal.
 
-## ✨ Features
+## Features
 
 - **Simple CLI:** Manage your network connection directly from the terminal.
 - **Credential Management:** Configure and securely store your network credentials locally.
@@ -94,7 +96,7 @@ Install it:
 sudo apt install ../sharifnet_*_all.deb
 ```
 
-## 🚀 Usage
+## Usage
 
 SharifNet provides both an interactive interface and individual commands.
 
@@ -154,7 +156,7 @@ sharifnet disconnect
 sharifnet interval 30
 ```
 
-## 🔄 Automatic Reconnection
+## Automatic Reconnection
 
 One of SharifNet's main features is its automatic reconnection mechanism.
 
@@ -239,8 +241,8 @@ Example configuration:
 
 ```json
 {
-    "username": "",
-    "password": "",
+    "username": "<YOUR_USERNAME>",
+    "password": "<YOUR_PASSWORD>",
     "auto_reconnect": false,
     "reconnect_interval": 60
 }
@@ -250,7 +252,7 @@ The configuration directory and file are restricted to the current user.
 
 > **Security note:** Credentials are stored locally. Although file permissions restrict access to your user account, the password is not encrypted. Do not share your configuration file or commit it to version control.
 
-## 🛠️ Troubleshooting
+## Troubleshooting
 
 ### The connection does not work
 
@@ -302,7 +304,7 @@ cat ~/.config/sharifnet/config.json
 
 Avoid sharing this output because it may contain your password.
 
-## 🧰 Technology Stack
+## Technology Stack
 
 - **Python** — Core application and CLI implementation.
 - **Requests** — HTTP communication with the university network authentication service.
@@ -310,37 +312,7 @@ Avoid sharing this output because it may contain your password.
 - **systemd** — Background monitoring and automatic reconnection.
 - **Debian Packaging** — Native `.deb` distribution.
 
-## 🤝 Contributing
-
-Contributions, bug reports, and feature requests are welcome!
-
-If you want to contribute:
-
-1. Fork this repository.
-2. Create a new branch:
-
-   ```bash
-   git checkout -b feature/your-feature
-   ```
-
-3. Make your changes.
-4. Commit your changes:
-
-   ```bash
-   git commit -m "Add: your feature"
-   ```
-
-5. Push your branch:
-
-   ```bash
-   git push origin feature/your-feature
-   ```
-
-6. Open a Pull Request.
-
-For major changes, please open an issue first to discuss what you would like to change.
-
-## 📄 License
+## License
 
 This project is distributed under the **MIT License**. See the [LICENSE](LICENSE) file for more information.
 
@@ -348,13 +320,11 @@ This project is distributed under the **MIT License**. See the [LICENSE](LICENSE
 
 SharifNet is an independent, community-developed utility and is not officially affiliated with, endorsed by, or maintained by Sharif University of Technology.
 
-Users are responsible for complying with the university's network usage policies.
+Users are responsible for complying with the university's network usage policies. (Nobody's gonna care, tbh. Apparently, cybersecurity is the last thing we care about here.)
 
 ---
 
 <div align="center">
-
-**Developed with ❤️ for the Sharif University of Technology community.**
 
 [GitHub Repository](https://github.com/AmirMJ-Z/SharifNet) · [Report a Bug](https://github.com/AmirMJ-Z/SharifNet/issues) · [Request a Feature](https://github.com/AmirMJ-Z/SharifNet/issues)
 
