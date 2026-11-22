@@ -176,12 +176,12 @@ class TrayApplication:
             self.remaining_volume.setText(f'{remaining:.3f} GB')
             self.remaining_volume.setIcon(self.REM_2)
 
-        elif remaining >= 0.1:
+        elif remaining >= 1:
             self.remaining_volume.setText(f'{remaining:.3f} GB')
             self.remaining_volume.setIcon(self.REM_1)
 
         else:
-            self.remaining_volume.setText(f'{remaining:.3f} GB')
+            self.remaining_volume.setText(f'{remaining*1024:.0f} MB')
             self.remaining_volume.setIcon(self.REM_0)
 
         self.menu.addAction(self.remaining_volume)

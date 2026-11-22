@@ -1,11 +1,12 @@
-sharifnet (1.2.0-1) UNRELEASED; urgency=medium
+sharifnet (1.2.0-2) UNRELEASED; urgency=medium
 
   * Fix PySide2 compatibility in Ubuntu system tray application.
   * Fixed some tray menu items updatingv problems.
   * Disabled the popup windows for now. 
   * Added the remaining volume indicator for the tray icon. 
+  * Changed the remaining volume indication under 1GB to MB. 
 
- -- Amirreza Mirjalily <amirreza-mirjalily@amirreza-mirjalily-ZenBook-UX482EGR-UX482EGR>  Sun, 22 Nov 2026 12:44:39 +0330
+ -- Amirreza Mirjalily <amirreza-mirjalily@amirreza-mirjalily-ZenBook-UX482EGR-UX482EGR>  Sun, 22 Nov 2026 13:02:58 +0330
 
 sharifnet (1.1.0-1) unstable; urgency=medium
 
