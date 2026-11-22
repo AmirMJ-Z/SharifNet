@@ -8,9 +8,9 @@ import time
 from pathlib import Path
 from getpass import getpass
 
-from sharifnet import connect
-from disconnect import disconnect
-from status import SharifNetStatus
+from core.sharifnet import connect
+from core.disconnect import disconnect
+from core.status import SharifNetStatus
 
 
 # ============================================================
@@ -77,13 +77,15 @@ class UI:
 def format_duration(seconds):
     if seconds < 60:
         return f"{seconds} seconds"
+    
     minutes, remainder = divmod(seconds, 60)
+
     if minutes < 60:
         return f"{minutes}m {remainder}s" if remainder else f"{minutes} minutes"
+    
     hours, minutes = divmod(minutes, 60)
+    
     return f"{hours}h {minutes}m" if minutes else f"{hours} hours"
-
-
 
 # ============================================================
 # Configuration Management
@@ -106,7 +108,6 @@ def load_config() -> dict:
     except (json.JSONDecodeError, OSError):
         logger.warning("Invalid configuration. Using defaults.")
         return DEFAULT_CONFIG.copy()
-
 
 def save_config(config: dict) -> None:
     CONFIG_DIR.mkdir(parents=True, exist_ok=True)
@@ -387,9 +388,6 @@ def set_reconnect_interval(seconds=None) -> None:
 
     print(f"Reconnect interval set to {seconds} seconds.")
 
-    # The monitor reads the updated interval automatically.
-    # No restart is necessary.
-
 
 def toggle_auto_reconnect() -> None:
     config = load_config()
@@ -398,7 +396,6 @@ def toggle_auto_reconnect() -> None:
         disable_auto_reconnect()
     else:
         enable_auto_reconnect()
-
 
 # ============================================================
 # Auto-Reconnect Daemon

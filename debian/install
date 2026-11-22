@@ -1,6 +1,7 @@
 cli.py usr/lib/sharifnet/
-sharifnet.py usr/lib/sharifnet/
-disconnect.py usr/lib/sharifnet/
-status.py usr/lib/sharifnet/
+desktop usr/lib/sharifnet/
+sharifnet_indicator usr/bin
+core usr/lib/sharifnet/
 sharifnet usr/bin/
 debian/sharifnet-monitor.service usr/lib/systemd/user/
+debian/sharifnet-indicator.service usr/lib/systemd/user/

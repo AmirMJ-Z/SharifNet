@@ -1,0 +1,20 @@
+[Unit]
+Description=SharifNet SystemTray Application
+After=graphical-session.
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/sharifnet_indicator
+
+Restart=on-failure
+RestartSec=5
+
+StandardOutput=journal
+StandardError=journal
+
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target

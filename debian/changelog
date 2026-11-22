@@ -1,7 +1,16 @@
-sharifnet (1.0.0-1) unstable; urgency=medium
+sharifnet (1.1.0-2ubuntu1) UNRELEASED; urgency=medium
 
-  * Initial Debian package.
+  * Fix PySide2 compatibility in Ubuntu system tray application.
+  * Fixed some tray menu items updatingv problems.
+  * Disabled the popup windows for now. 
+
+ -- Amirreza Mirjalily <amirreza-mirjalily@amirreza-mirjalily-ZenBook-UX482EGR-UX482EGR>  Sun, 22 Nov 2026 11:31:52 +0330
+
+sharifnet (1.1.0-1) unstable; urgency=medium
+
+  * Add Ubuntu system tray icon for graphical connection management.
+  * Improve desktop integration.
   * Add CLI for connection management.
   * Add systemd user service for automatic reconnection.
 
- -- Amirreza Mirjalily <mirjalilyamirreza@gmail.com>  Thu, 19 Nov 2026 12:00:00 +0330
+ -- Amirreza Mirjalily <mirjalilyamirreza@gmail.com>  Sun, 22 Nov 2026 01:00:00 +0330

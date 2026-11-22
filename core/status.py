@@ -6,7 +6,7 @@ from typing import Optional
 import requests
 from bs4 import BeautifulSoup
 
-from sharifnet import connect
+from core.sharifnet import connect
 
 BASE_URL = "https://net.sharif.ir"
 LOGIN_URL = f"{BASE_URL}/en-us/user/login/"
@@ -123,6 +123,7 @@ class SharifNetStatus:
 
         try:
             data = response.json()
+            
         except ValueError as exc:
             raise SharifNetStatusError(
                 "Invalid status response."
