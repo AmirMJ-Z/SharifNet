@@ -15,7 +15,7 @@
 
 **Connect. Monitor. Reconnect. Automatically.**
 
-[Features](#-features) · [Installation](#-installation) · [Usage](#-usage) · [Auto-Reconnection](#-automatic-reconnection) · [Troubleshooting](#-troubleshooting)
+[Features](#-features) · [Installation](#-installation) · [Usage](#-usage) · [Desktop Indicator](#-desktop-indicator) · [Automatic Reconnection](#-automatic-reconnection) · [Troubleshooting](#-troubleshooting)
 
 </div>
 
@@ -27,7 +27,9 @@
 
 Instead of manually connecting to the university network whenever your connection drops, SharifNet provides a unified CLI for managing your credentials, establishing and terminating connections, checking connection status, and automatically reconnecting when connectivity is lost.
 
-It also integrates with **systemd user services**, allowing automatic connection monitoring to run in the background without requiring an open terminal.
+SharifNet also integrates with **systemd user services**, allowing automatic connection monitoring to run in the background without requiring an open terminal.
+
+Additionally, SharifNet now includes a **desktop system tray indicator** for Linux, providing convenient graphical access to connection management. You can monitor your connection status, connect or disconnect, and control automatic reconnection directly from your desktop without opening a terminal.
 
 ## Features
 
@@ -40,6 +42,9 @@ It also integrates with **systemd user services**, allowing automatic connection
 - **systemd Integration:** Run the reconnection monitor as a background user service.
 - **Persistent Configuration:** Keep your settings between system restarts.
 - **Lightweight:** Minimal dependencies and no graphical interface required.
+- **Desktop Indicator:** Manage your network connection through a convenient system tray application.
+- **Graphical Controls:** Connect, disconnect, and manage automatic reconnection without using the terminal.
+- **Live Status:** View your current connection and automatic reconnection status directly from the system tray.
 
 ## 📦 Installation
 
@@ -95,6 +100,8 @@ Install it:
 ```bash
 sudo apt install ../sharifnet_*_all.deb
 ```
+
+> **Desktop Integration:** The Debian package also installs the SharifNet desktop indicator and its application launcher. You can find it in your desktop environment's application menu.
 
 ## Usage
 
@@ -155,6 +162,53 @@ sharifnet disconnect
 ```bash
 sharifnet interval 30
 ```
+
+## Desktop Indicator
+
+SharifNet now includes a lightweight **system tray indicator** that provides quick access to network management directly from your Linux desktop.
+
+Once installed, the indicator can be launched from your application menu or configured to start automatically when you log in.
+
+Through the indicator, you can:
+
+- **View Connection Status:** Quickly see whether you are connected to the university network.
+- **Connect:** Establish a connection without opening a terminal.
+- **Disconnect:** Terminate your current network connection.
+- **Enable Automatic Reconnection:** Start the background monitoring service.
+- **Disable Automatic Reconnection:** Stop the background monitoring service.
+- **Monitor Service Status:** Check whether automatic reconnection is enabled.
+
+### Launch the indicator
+
+If it is not already running, launch SharifNet Indicator from your desktop application menu.
+
+Alternatively, you can launch it from the terminal:
+
+```bash
+sharifnet-indicator
+```
+
+The indicator runs independently of the automatic reconnection service. Closing the indicator does **not** stop the background monitoring service.
+
+There is a service behind the indicator as well, which can be enabled using `systemd`:
+
+```bash
+systemctl --user enable sharifnet-indicator.service
+systemctl --user start sharifnet-indicator.service
+systemctl --user status sharifnet-indicator.service
+```
+
+### Managing the background service
+
+You can control automatic reconnection directly through the indicator:
+
+- **Enable:** Starts the background monitoring service.
+- **Disable:** Stops the background monitoring service.
+- **Close:** Exits the indicator without affecting the monitoring service.
+
+This separation allows you to close the graphical interface while keeping automatic reconnection running in the background.
+
+> **Note:** The indicator is a graphical interface for managing SharifNet. It does not need to remain open for automatic reconnection to work.
 
 ## Automatic Reconnection
 
@@ -311,6 +365,7 @@ Avoid sharing this output because it may contain your password.
 - **Beautiful Soup** — HTML parsing.
 - **systemd** — Background monitoring and automatic reconnection.
 - **Debian Packaging** — Native `.deb` distribution.
+- **PySide6 (Qt):** Desktop system tray indicator and graphical controls.
 
 ## License
 
