@@ -158,6 +158,13 @@ class TrayApplication:
         except Exception as _:
             status = None
 
+        config = load_config()
+
+        if config is not None:
+            self.username_indicator.setText(config['username'])
+            self.menu.addAction(self.username_indicator)
+            self.menu.addSeparator()
+
         if status is not None and status.connected:
             self.menu.addAction(self.disable_action)
             self.tray.setIcon(self.IND_CONNECTED)
@@ -187,8 +194,6 @@ class TrayApplication:
         self.menu.addAction(self.remaining_volume)
 
         self.menu.addSeparator()
-
-        config = load_config()
         
         if config["auto_reconnect"]:
             self.menu.addAction(self.disable_auto_action)
@@ -223,6 +228,11 @@ class TrayApplication:
         self.REM_1 = QIcon(str(ASSETS_DIR / "remaining_1.png"))
         self.REM_0 = QIcon(str(ASSETS_DIR / "remaining_0.png"))
 
+        self.USER_ICON = QIcon(str(ASSETS_DIR / "user.png"))
+
+        self.ON_ICON = QIcon(str(ASSETS_DIR / "on.png"))
+        self.OFF_ICON = QIcon(str(ASSETS_DIR / "off.png"))
+
         self.open_action = QAction("Open SharifNet")
         self.open_action.triggered.connect(self.show_window)
                 
@@ -235,11 +245,13 @@ class TrayApplication:
         self.enable_action = QAction(self.ICON_ACTIVE, "Connect")
         self.enable_action.triggered.connect(self.enable)
 
-        self.enable_auto_action = QAction("Enable Auto-Reconnect") # TODO: Add icon for these as well
+        self.enable_auto_action = QAction(self.OFF_ICON, "Enable Auto-Reconnect") 
         self.enable_auto_action.triggered.connect(self.enable_auto)
 
-        self.disable_auto_action = QAction("Disable Auto-Reconnect")
+        self.disable_auto_action = QAction(self.ON_ICON, "Disable Auto-Reconnect")
         self.disable_auto_action.triggered.connect(self.disable_auto)
+
+        self.username_indicator = QAction(self.USER_ICON, "USER")
 
         self.remaining_volume = QAction(None)
 

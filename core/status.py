@@ -178,6 +178,7 @@ def get_connection_status() -> ConnectionStatus:
     try:
         client.authenticate()
         return client.get_status()
+    
     finally:
         client.close()
 

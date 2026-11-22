@@ -2,7 +2,6 @@ from core.sharifnet import connect
 from core.disconnect import disconnect
 from core.status import get_connection_status, ensure_connected
 
-
 class SharifNet:
     """Unified programmatic interface for SharifNet."""
 
