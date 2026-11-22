@@ -160,11 +160,31 @@ class TrayApplication:
 
         if status is not None and status.connected:
             self.menu.addAction(self.disable_action)
-            self.tray.setIcon(self.IND_DISCONNECTED)
+            self.tray.setIcon(self.IND_CONNECTED)
 
         else:
             self.menu.addAction(self.enable_action)
-            self.tray.setIcon(self.IND_CONNECTED)
+            self.tray.setIcon(self.IND_DISCONNECTED)
+
+        remaining = status.remaining_volume
+
+        if remaining >= 20:
+            self.remaining_volume.setText(f'{remaining:.3f} GB')
+            self.remaining_volume.setIcon(self.REM_3)
+
+        elif remaining >= 10:
+            self.remaining_volume.setText(f'{remaining:.3f} GB')
+            self.remaining_volume.setIcon(self.REM_2)
+
+        elif remaining >= 0.1:
+            self.remaining_volume.setText(f'{remaining:.3f} GB')
+            self.remaining_volume.setIcon(self.REM_1)
+
+        else:
+            self.remaining_volume.setText(f'{remaining:.3f} GB')
+            self.remaining_volume.setIcon(self.REM_0)
+
+        self.menu.addAction(self.remaining_volume)
 
         self.menu.addSeparator()
 
@@ -198,16 +218,21 @@ class TrayApplication:
         self.IND_CONNECTED = self.ICON_ACTIVE
         self.IND_DISCONNECTED = self.ICON_DEACTIVE
 
+        self.REM_3 = QIcon(str(ASSETS_DIR / "remaining_3.png"))
+        self.REM_2 = QIcon(str(ASSETS_DIR / "remaining_2.png"))
+        self.REM_1 = QIcon(str(ASSETS_DIR / "remaining_1.png"))
+        self.REM_0 = QIcon(str(ASSETS_DIR / "remaining_0.png"))
+
         self.open_action = QAction("Open SharifNet")
         self.open_action.triggered.connect(self.show_window)
                 
         self.exit_action = QAction(self.ICON_CLOSE, "Exit")
         self.exit_action.triggered.connect(self.quit)
 
-        self.disable_action = QAction(self.ICON_ACTIVE, "Disconnect")
+        self.disable_action = QAction(self.ICON_DEACTIVE, "Disconnect")
         self.disable_action.triggered.connect(self.disable)
 
-        self.enable_action = QAction(self.ICON_DEACTIVE, "Connect")
+        self.enable_action = QAction(self.ICON_ACTIVE, "Connect")
         self.enable_action.triggered.connect(self.enable)
 
         self.enable_auto_action = QAction("Enable Auto-Reconnect") # TODO: Add icon for these as well
@@ -216,15 +241,17 @@ class TrayApplication:
         self.disable_auto_action = QAction("Disable Auto-Reconnect")
         self.disable_auto_action.triggered.connect(self.disable_auto)
 
+        self.remaining_volume = QAction(None)
+
         self.menu = QMenu()
+
+        self.menu_is_open = False
 
         self.update_menu()
 
         self.tray.activated.connect(self.on_tray_activated)
 
         self.tray.show()
-
-        self.menu_is_open = False
 
         self.menu.aboutToShow.connect(
             lambda: setattr(self, "menu_is_open", True)
@@ -359,3 +386,6 @@ class TrayApplication:
 def main():
     application = TrayApplication()
     application.run()
+
+if __name__ == "__main__":
+    main()

@@ -16,22 +16,21 @@ REQUEST_TIMEOUT = 10
 
 logger = logging.getLogger(__name__)
 
-
 class SharifNetStatusError(Exception):
     """Raised when connection status cannot be retrieved."""
-
 
 @dataclass
 class ConnectionStatus:
     connected: bool
     ip: Optional[str] = None
+    remaining_volume: Optional[float] = None
 
     def to_dict(self) -> dict:
         return {
             "connected": self.connected,
             "ip": self.ip,
+            "remaining_volume": self.remaining_volume
         }
-
 
 class SharifNetStatus:
     """Retrieve SharifNet connection status."""
@@ -123,7 +122,7 @@ class SharifNetStatus:
 
         try:
             data = response.json()
-            
+
         except ValueError as exc:
             raise SharifNetStatusError(
                 "Invalid status response."
@@ -138,9 +137,24 @@ class SharifNetStatus:
 
         connected = data["result"] != [[]]
 
+        metadata_response = self._request(
+            "GET",
+            f"{BASE_URL}/en-us/user/get_user_metadata/",
+            headers=headers,
+        )
+
+        metadata = metadata_response.json()
+
+        user_data = metadata["result"]
+        user_id = next(iter(user_data))
+        credit = int(user_data[user_id]["credit"])
+
+        remaining_volume = credit / 1024
+
         return ConnectionStatus(
             connected=connected,
             ip=ip,
+            remaining_volume=remaining_volume
         )
 
     def close(self) -> None:
