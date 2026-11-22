@@ -23,6 +23,10 @@
 
 ## Overview
 
+<div align="center">
+  <img src="images/SharifNet Tray App UI.png" alt="SharifNet – Manage your SharifNet connection with ease" width="100%">
+</div>
+
 **SharifNet** is a lightweight command-line utility designed to simplify network connection management at **Sharif University of Technology**.
 
 Instead of manually connecting to the university network whenever your connection drops, SharifNet provides a unified CLI for managing your credentials, establishing and terminating connections, checking connection status, and automatically reconnecting when connectivity is lost.
