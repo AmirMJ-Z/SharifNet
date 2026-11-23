@@ -1,4 +1,4 @@
-sharifnet (1.3.0-1) UNRELEASED; urgency=medium
+sharifnet (1.3.0-3) UNRELEASED; urgency=medium
 
   * Fix PySide2 compatibility in Ubuntu system tray application.
   * Fixed some tray menu items updatingv problems.
@@ -8,8 +8,9 @@ sharifnet (1.3.0-1) UNRELEASED; urgency=medium
   * Updated the logos and icons for the desktop version. 
   * Added the username indicator.
   * Added the auto-reconnect icon. 
+  * Updated the on/off icons.  
 
- -- Amirreza Mirjalily <amirreza-mirjalily@amirreza-mirjalily-ZenBook-UX482EGR-UX482EGR>  Sun, 22 Nov 2026 15:59:33 +0330
+ -- Amirreza Mirjalily <amirreza-mirjalily@amirreza-mirjalily-ZenBook-UX482EGR-UX482EGR>  Mon, 23 Nov 2026 16:46:57 +0330
 
 sharifnet (1.1.0-1) unstable; urgency=medium
 

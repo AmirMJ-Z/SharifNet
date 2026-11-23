@@ -239,10 +239,10 @@ class TrayApplication:
         self.exit_action = QAction(self.ICON_CLOSE, "Exit")
         self.exit_action.triggered.connect(self.quit)
 
-        self.disable_action = QAction(self.ICON_DEACTIVE, "Disconnect")
+        self.disable_action = QAction(self.ICON_ACTIVE, "Disconnect")
         self.disable_action.triggered.connect(self.disable)
 
-        self.enable_action = QAction(self.ICON_ACTIVE, "Connect")
+        self.enable_action = QAction(self.ICON_DEACTIVE, "Connect")
         self.enable_action.triggered.connect(self.enable)
 
         self.enable_auto_action = QAction(self.OFF_ICON, "Enable Auto-Reconnect") 
