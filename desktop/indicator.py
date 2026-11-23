@@ -9,9 +9,11 @@ try:
         QWidget,
         QLabel,
         QVBoxLayout,
+        QProgressBar,
+        QWidgetAction
     )
-    from PySide6.QtGui import QIcon, QAction
-    from PySide6.QtCore import QTimer
+    from PySide6.QtGui import QIcon, QAction, QPixmap, QPainter, QColor
+    from PySide6.QtCore import QTimer, Qt
 
 except ImportError:
     from PySide2.QtWidgets import (
@@ -22,9 +24,11 @@ except ImportError:
         QLabel,
         QVBoxLayout,
         QAction,
+        QProgressBar,
+        QWidgetAction
     )
-    from PySide2.QtGui import QIcon
-    from PySide2.QtCore import QTimer
+    from PySide2.QtGui import QIcon, QPixmap, QPainter, QColor
+    from PySide2.QtCore import QTimer, Qt
 
 import os
 import json
@@ -52,6 +56,18 @@ SERVICE_NAME = "sharifnet-monitor.service"
 ASSETS_DIR = Path(__file__).resolve().parent / "assets"
 
 LOOP_INTERVAL = 2500
+
+#===============================================================
+
+TOTAL_VOLUME_GB = 30
+PERCENTAGE_MODE = False
+
+GREEN = "#13d571"
+YELLOW = "#e6a70e"
+RED = "#ca0d0d"
+GRAY = "#99a0af"
+
+REMAINING_VOLUME = 0
 
 def load_config() -> dict:
     CONFIG_DIR.mkdir(parents=True, exist_ok=True)
@@ -130,7 +146,6 @@ def get_status():
         client.close()
 
 #=========================================================
-
 class MainWindow(QWidget):
     def __init__(self):
         super().__init__()
@@ -141,27 +156,52 @@ class MainWindow(QWidget):
         layout = QVBoxLayout(self)
         layout.addWidget(QLabel("Welcome to SharifNet!"))
 
+class RemainingTrayApp:
+    @staticmethod
+    def generate_progress_image(progress: float, color: str) -> QIcon:
+        width, height = 512, 150
+        radius = height / 2
+
+        pixmap = QPixmap(width, height)
+        pixmap.fill(Qt.transparent)
+
+        painter = QPainter(pixmap)
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setPen(Qt.NoPen)
+
+        painter.setBrush(QColor(GRAY))
+        painter.drawRoundedRect(0, 0, width, height, radius, radius)
+
+        filled_width = int(width * max(0, min(100, progress)) / 100)
+
+        if filled_width > 0:
+            painter.setBrush(QColor(color))
+            painter.drawRoundedRect(
+                0, 0, filled_width, height, radius, radius
+            )
+
+        painter.end()
+
+        return QIcon(pixmap)
 class TrayApplication:
     def update_menu(self):
+        global REMAINING_VOLUME
 
         if self.menu_is_open:
             return
-        
-        self.menu.clear()
 
-        # self.menu.addAction(self.open_action)
-        # self.menu.addSeparator()
+        self.menu.clear()
 
         try:
             status = get_status()
 
-        except Exception as _:
+        except Exception:
             status = None
 
         config = load_config()
 
-        if config is not None:
-            self.username_indicator.setText(config['username'])
+        if config["username"]:
+            self.username_indicator.setText(config["username"])
             self.menu.addAction(self.username_indicator)
             self.menu.addSeparator()
 
@@ -172,29 +212,32 @@ class TrayApplication:
         else:
             self.menu.addAction(self.enable_action)
             self.tray.setIcon(self.IND_DISCONNECTED)
+            self.remaining_tray.setIcon(RemainingTrayApp.generate_progress_image(progress=0, color=GRAY))
 
-        remaining = status.remaining_volume
+            if config["auto_reconnect"]:
+                self.menu.addAction(self.disable_auto_action)
 
-        if remaining >= 20:
-            self.remaining_volume.setText(f'{remaining:.3f} GB')
-            self.remaining_volume.setIcon(self.REM_3)
+            else:
+                self.menu.addAction(self.enable_auto_action)
 
-        elif remaining >= 10:
-            self.remaining_volume.setText(f'{remaining:.3f} GB')
-            self.remaining_volume.setIcon(self.REM_2)
+            self.menu.addSeparator()
+            self.menu.addAction(self.exit_action)
 
-        elif remaining >= 1:
-            self.remaining_volume.setText(f'{remaining:.3f} GB')
-            self.remaining_volume.setIcon(self.REM_1)
+            self.tray.setContextMenu(self.menu)
+            self.remaining_tray.setContextMenu(self.menu)
 
-        else:
-            self.remaining_volume.setText(f'{remaining*1024:.0f} MB')
-            self.remaining_volume.setIcon(self.REM_0)
+            return
 
-        self.menu.addAction(self.remaining_volume)
+        if status is not None:
+            remaining = status.remaining_volume
+            REMAINING_VOLUME = status.remaining_volume
+
+            self.create_remaining_display_text(remaining)
+
+            self.menu.addAction(self.remaining_volume)
 
         self.menu.addSeparator()
-        
+
         if config["auto_reconnect"]:
             self.menu.addAction(self.disable_auto_action)
 
@@ -205,11 +248,18 @@ class TrayApplication:
         self.menu.addAction(self.exit_action)
 
         self.tray.setContextMenu(self.menu)
-            
+        self.remaining_tray.setContextMenu(self.menu)
 
     def __init__(self):
         self.app = QApplication(sys.argv)
         self.app.setQuitOnLastWindowClosed(False)
+
+        self.remaining_tray = QSystemTrayIcon()
+        self.remaining_tray.setToolTip("Remaining Internet Volume")
+
+        self.remaining_tray.setIcon(
+            RemainingTrayApp.generate_progress_image(0, GRAY)
+        )
 
         self.window = MainWindow()
 
@@ -252,8 +302,10 @@ class TrayApplication:
         self.disable_auto_action.triggered.connect(self.disable_auto)
 
         self.username_indicator = QAction(self.USER_ICON, "USER")
+        self.username_indicator.setEnabled(False)
 
         self.remaining_volume = QAction(None)
+        self.remaining_volume.triggered.connect(self.switch_remaining_display)
 
         self.menu = QMenu()
 
@@ -264,6 +316,7 @@ class TrayApplication:
         self.tray.activated.connect(self.on_tray_activated)
 
         self.tray.show()
+        self.remaining_tray.show()
 
         self.menu.aboutToShow.connect(
             lambda: setattr(self, "menu_is_open", True)
@@ -284,6 +337,46 @@ class TrayApplication:
 
         self.status_timer.timeout.connect(self.update_menu)
         self.status_timer.start(LOOP_INTERVAL)
+
+    def switch_remaining_display(self):
+        global PERCENTAGE_MODE
+        global REMAINING_VOLUME
+
+        PERCENTAGE_MODE = not PERCENTAGE_MODE
+        self.create_remaining_display_text(REMAINING_VOLUME)
+
+    def create_remaining_display_text(self, remaining: float):
+        global PERCENTAGE_MODE
+
+        if remaining >= 20:
+            self.remaining_volume.setIcon(self.REM_3)
+            color = GREEN
+        
+        elif remaining >= 10:
+            self.remaining_volume.setIcon(self.REM_2)
+            color = YELLOW
+        
+        elif remaining >= 1:
+            self.remaining_volume.setIcon(self.REM_1)
+            color = RED
+        
+        else:
+            self.remaining_volume.setIcon(self.REM_0)
+            color = GRAY
+
+        percentage = int((remaining/TOTAL_VOLUME_GB) * 100)
+
+        self.remaining_tray.setIcon(RemainingTrayApp.generate_progress_image(progress=percentage, color=color))
+
+        if PERCENTAGE_MODE:
+            self.remaining_volume.setText(f'{percentage}%')
+
+        else:
+            if remaining < 1:
+                self.remaining_volume.setText(f'{remaining * 1024:.0f} MB')
+
+            else:
+                self.remaining_volume.setText(f'{remaining:.3f} GB')
 
     def show_window(self):
         self.window.show()
@@ -328,7 +421,6 @@ class TrayApplication:
                 config["password"],
             )
 
-            # self.tray.showMessage("SharifNet", "Disconnected Succesfully.")
             self.update_menu()
         
         except Exception as exc:
@@ -387,6 +479,7 @@ class TrayApplication:
 
     def quit(self):
         self.tray.hide()
+        self.remaining_tray.hide()
         self.app.quit()
 
     def run(self):
